@@ -1,9 +1,12 @@
 class Player {
-  constructor({ x, y, score, id }) {
+  constructor({ x, y, score, id, width, height, avatar }) {
     this.x = x;
     this.y = y;
     this.score = score;
     this.id = id;
+    this.width = width;
+    this.height = height;
+    this.avatar = avatar;
   }
 
   movePlayer(dir, speed) {
@@ -22,16 +25,31 @@ class Player {
         break;
 
       default:
-        true;
         break;
     }
   }
 
-  collision(item) {}
+  collision(item) {
+    if (
+      item.x + item.width >= this.x &&
+      item.x <= this.x + this.width &&
+      item.y + item.height >= this.y &&
+      item.y <= this.y + this.height
+    ) {
+      return true;
+    } else {
+      return false
+    }
+  }
 
   calculateRank(arr) {
-    let sorted = arr.sort((p1, p2) => p2.score - p1.score);
-    return `${sorted.indexOf()}/${arr.lenght}`
+    return `${arr
+      .sort((p1, p2) => p2.score - p1.score)
+      .indexOf((p) => p.id == this.id)}/${arr.lenght}`;
+  }
+
+  display(ctx) {
+    return ctx.drawImage(this.avatar, this.x, this.y, this.width, this.height);
   }
 }
 

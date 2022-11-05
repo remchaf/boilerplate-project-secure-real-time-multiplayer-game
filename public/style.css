@@ -8,6 +8,9 @@ code {
 
 canvas {
   margin: auto;
+  width: 800px;
+  height: 600px;
+  background-color: whitesmoke;
 }
 
 .container {
@@ -19,4 +22,18 @@ canvas {
   .container {
     flex-direction: row;
   }
+}
+
+#collectible {
+  width: 15px;
+  height: 15px;
+  display: none;
+}
+
+#blue,
+#green,
+#red {
+  display: none;
+  width: 35px;
+  height: 35px;
 }
