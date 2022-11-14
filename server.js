@@ -5,7 +5,6 @@ const bodyParser = require("body-parser");
 // const socket = require("socket.io");
 const cors = require("cors");
 const helmet = require("helmet");
-const { serialize, parse } = require("cookie");
 
 const fccTestingRoutes = require("./routes/fcctesting.js");
 const runner = require("./test-runner.js");
@@ -35,7 +34,7 @@ app.use(
 
 // Index page (static HTML)
 app.route("/").get(function (req, res) {
-  res.sendFile(process.cwd() + "/views/idx.html");
+  res.sendFile(process.cwd() + "/views/index.html");
 });
 
 //For FCC testing purposes
@@ -55,21 +54,38 @@ const avatars = [
 ];
 const { createServer } = require("http");
 const Server = require("socket.io");
-const socket = require("socket.io-client/lib/socket.js");
 
 const httpServer = createServer(app);
-const io = new Server(httpServer);
-
-io.on("connection", async (socket) => {
-  const idx = avatars.findIndex((a) => !a[-1]);
-  avatars[idx][-1] = socket.id.toString(); /* ***** */
-  const avatar = avatars[idx][0];
-
-  io.volatile.send({ ID: avatar }); /* ************** */
+const io = new Server(httpServer, {
+  cookie: {
+    name: "io",
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+  },
 });
 
-io.on("disconnect", (socket) => {
-  avatars[avatars.findIndex((a) => a[-1] == socket.id)][-1] = null;
+io.engine.on("initial_headers", (headers, req) => {
+  console.log("Request headers.id: " + req.socket.handshake.headers.cookie);
+  const idx = avatars.findIndex((a) => !a[-1]);
+  avatars[idx][-1] = headers.id.toString(); /* ***** */
+  const avatar = avatars[idx][0];
+
+  io.send({ ID: avatar }); /* ************** */
+});
+
+io.on("connection", async (socket) => {
+  // console.log(socket.handshake.headers.cookie.match(/=(\S+);/).pop());
+  // io.send("This is the ID from this socket connection: " + socket.id);
+
+  socket.on("disconnect", (socket) => {
+    avatars[avatars.findIndex((a) => a[-1] == socket.id)][-1] = null;
+  });
+});
+
+io.on("message", (message) => {
+  console.log(message);
+  return;
 });
 
 // io.on("handshake", function() {

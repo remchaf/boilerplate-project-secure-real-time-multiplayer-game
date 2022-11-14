@@ -32,7 +32,8 @@ canvas {
 
 #blue,
 #green,
-#red {
+#red,
+#packman {
   display: none;
   width: 35px;
   height: 35px;

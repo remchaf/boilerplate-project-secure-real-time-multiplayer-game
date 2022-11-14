@@ -1,12 +1,12 @@
 class Player {
-  constructor({ x, y, score, id, width, height, avatar }) {
+  constructor(x, y, score, id, width, height, avatar) {
     this.x = x;
     this.y = y;
     this.score = score;
     this.id = id;
     this.width = width;
     this.height = height;
-    this.avatar = avatar;
+    this.avatar = document.getElementById(avatar);
   }
 
   movePlayer(dir, speed) {
@@ -38,7 +38,7 @@ class Player {
     ) {
       return true;
     } else {
-      return false
+      return false;
     }
   }
 
@@ -49,7 +49,8 @@ class Player {
   }
 
   display(ctx) {
-    return ctx.drawImage(this.avatar, this.x, this.y, this.width, this.height);
+    ctx.drawImage(this.avatar, this.x, this.y, 15, 15);
+    return 
   }
 }
 

@@ -1,20 +1,21 @@
 class Collectible {
-  constructor({ x = 10, y = 10, value, id = 1 }) {
+  constructor(x = 10, y = 10, value = 0, id = 1) {
     this.x = x;
     this.y = y;
     this.value = value;
     this.id = id;
   }
 
-  coll = document.getElementById("collectible");
+  
+  display(ctx) {
+    const collectible_avatar = document.getElementById("collectible");
+    ctx.drawImage(collectible_avatar, this.x, this.y, 10, 10);
+  }
 
-  display(ctx, game_width, game_height) {
-    // Random position of the collectible
-    const x = Math.round(Math.random() * (game_width - 20) + 10);
-    const y = Math.round(Math.random() * (game_height - 20) + 10);
-
-    // Then display the collectible
-    ctx.drawImage(coll, x, y, 10, 10);
+  update(game_width, game_height) {
+    // Random position for the collectible
+    this.x = Math.round(Math.random() * (game_width - 20) + 10);
+    this.y = Math.round(Math.random() * (game_height - 20) + 10);
   }
 }
 
