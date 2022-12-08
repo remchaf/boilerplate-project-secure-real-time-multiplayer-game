@@ -6,16 +6,14 @@ class Collectible {
     this.id = id;
   }
 
-  
   display(ctx) {
     const collectible_avatar = document.getElementById("collectible");
     ctx.drawImage(collectible_avatar, this.x, this.y, 10, 10);
   }
 
-  update(game_width, game_height) {
-    // Random position for the collectible
-    this.x = Math.round(Math.random() * (game_width - 20) + 10);
-    this.y = Math.round(Math.random() * (game_height - 20) + 10);
+  update(param_object) {
+    this.x = param_object.x;
+    this.y = param_object.y;
   }
 }
 

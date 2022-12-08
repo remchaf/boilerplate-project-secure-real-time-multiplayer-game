@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 // const socket = require("socket.io");
 const cors = require("cors");
 const helmet = require("helmet");
+// const game = require("./public/game_const.mjs");
 
 const fccTestingRoutes = require("./routes/fcctesting.js");
 const runner = require("./test-runner.js");
@@ -46,70 +47,60 @@ app.use(function (req, res, next) {
 });
 
 // Socket
+const { createServer } = require("http");
+const Server = require("socket.io");
+
+const httpServer = createServer(app);
+
+const io = Server(httpServer, {
+  pingTimeout: 18000,
+  pingInterval: 25000,
+});
+
+// Addresses
+var addresses = [];
+
 const avatars = [
   ["blue", null],
   ["green", null],
   ["red", null],
   ["packman", null],
 ];
-const { createServer } = require("http");
-const Server = require("socket.io");
-
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cookie: {
-    name: "io",
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-  },
-});
-
-io.engine.on("initial_headers", (headers, req) => {
-  console.log("Request headers.id: " + req.socket.handshake.headers.cookie);
-  const idx = avatars.findIndex((a) => !a[-1]);
-  avatars[idx][-1] = headers.id.toString(); /* ***** */
-  const avatar = avatars[idx][0];
-
-  io.send({ ID: avatar }); /* ************** */
-});
 
 io.on("connection", async (socket) => {
-  // console.log(socket.handshake.headers.cookie.match(/=(\S+);/).pop());
-  // io.send("This is the ID from this socket connection: " + socket.id);
+  // Get the address of the incoming connection.
+  const address = socket.handshake.address;
 
+  // Pushing the new player's address in addresses array.
+  if (addresses.indexOf(address) == -1) {
+    addresses.push(address);
+  }
+
+  // Handling disconnection of a socket.
   socket.on("disconnect", (socket) => {
     avatars[avatars.findIndex((a) => a[-1] == socket.id)][-1] = null;
   });
 });
 
-io.on("message", (message) => {
-  console.log(message);
-  return;
+io.engine.on("initial_headers", (headers, req) => {
+  // Defining the object to be emitted.
+  const object = {
+    x: randomPlace(800),
+    y: randomPlace(600),
+  };
+  object.col_x = randomPlace(800);
+  object.col_y = randomPlace(400);
+
+  // Set the player's avatar
+  avatars[avatars.length - addresses.length - 1][1] = address;
+  object.avatar = avatars[avatars.length - addresses.length - 1];
+
+  // Emition of the "new player" event to all connected sockets.
+  io.emit("new player", object);
 });
 
-// io.on("handshake", function() {
-//   console.log("Got the msg")
-//   return
-// })
-
-// called during the handshake
-// io.engine.on("initial_headers", (headers, request) => {
-//   const id = io.clientsCount();
-//   headers["set-cookie"] = serialize("uid", id, { sameSite: "strict" });
-// });
-
-// called for each HTTP request (including the WebSocket upgrade)
-// io.engine.on("headers", (headers, request) => {
-//   if (!request.headers.cookie) return;
-//   const cookies = parse(request.headers.cookie);
-//   console.log(cookies);
-//   if (!cookies.uid) {
-//     const id = io.clientsCount();
-//     headers["set-cookie"] = serialize("uid", id, { maxAge: 1086400 });
-//     console.log("Set the uid cookie !")
-//   }
-// });
+// Random place defining function.
+const randomPlace = (param) => Math.round(Math.random() * (param - 20) + 10);
 
 const portNum = process.env.PORT || 3000;
 // Set up server and tests

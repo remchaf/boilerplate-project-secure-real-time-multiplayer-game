@@ -1,43 +1,84 @@
 import Player from "./Player.mjs";
 import Collectible from "./Collectible.mjs";
+// Instanciation of the socket.io class
+const socket = io();
 
+// Global constants.
+const canvas = document.getElementById("game-window");
+const context = canvas.getContext("2d");
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
 
-const socket = io();
-socket.on("connect", async function () {
-  console.log("Connected to the server.\n\r\r\r ID: " + socket.id);
+let player = null;
+let collectible = null;
 
-  const canvas = document.getElementById("game-window");
-  const context = canvas.getContext("2d");
-  
-  
-  let player = await socket.on("message", (message) => {
-    console.log(message);
-    return new Player(
+// The event listener
+document.addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case "ArrowLeft":
+    case "a":
+      alert("LEFT");
+      break;
+    case "ArrowRight":
+    case "d":
+      alert("RIGHT");
+      break;
+    case "ArrowUp":
+    case "w":
+      alert("UP");
+      break;
+    case "ArrowDown":
+    case "s":
+      alert("DOWN");
+      break;
+    default:
+      alert("INVALID KEY ! Use 'W' 'A' 'S' 'D' arrow keys.");
+      break;
+  }
+});
+
+socket.on("new player", (data) => {
+  console.log(data);
+  if (!collectible) {
+    collectible = new Collectible({ x: data.col_x, y: data.col_y });
+  }
+
+  if (!player) {
+    player = new Player(
       GAME_WIDTH / 2,
       GAME_HEIGHT / 2,
       0,
-      socket.id,
+      "only_player",
       15,
       15,
-      message.ID
+      data.avatar
     );
-  });
-  let collectible = new Collectible();
-  collectible.update(GAME_WIDTH, GAME_HEIGHT);
-  collectible.display(context);
-  player.display(context);
-
-  socket.on("disconnecting", (socket) => {
-    socket.send("Bye !");
-    return;
-  });
+  }
 });
 
-// canvas.addEventListener("keydown", function (event) {
-//   console.log(event.code);
-// });
+socket.on("connect", async function (socket) {
+  console.log(socket);
+
+  // About the game loop
+  // let lastTime = 0;
+  // function gameLoop(timestamp) {
+  //   // Clearing the canvas
+  //   context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+  //   const dt = timestamp - lastTime;
+  //   lastTime = timestamp;
+
+  //   collectible.display(context);
+  //   player.display(context);
+  // }
+
+  // requestAnimationFrame(gameLoop);
+
+  // socket.on("disconnecting", (socket) => {
+  //   socket.send("Bye !");
+  //   return;
+  // });
+});
 
 // function gameLoop(ctx, player) {
 //   ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -69,3 +110,4 @@ socket.on("connect", async function () {
 //     }
 //   });
 // }
+
