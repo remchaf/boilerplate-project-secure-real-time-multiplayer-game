@@ -26,7 +26,7 @@ app.use(cors({ origin: "*" }));
 app.use(
   helmet.noSniff(),
   helmet.xssFilter(),
-  helmet.noCache(),
+  // helmet.noCache(),
   function (req, res, next) {
     res.setHeader("X-Powered-By", "PHP 7.4.3");
     next();
@@ -67,36 +67,27 @@ const avatars = [
   ["packman", null],
 ];
 
-io.on("connection", async (socket) => {
-  // Get the address of the incoming connection.
-  const address = socket.handshake.address;
+io.once("connection", async (socket) => {
+  console.log(socket.id);
+});
 
-  // Pushing the new player's address in addresses array.
-  if (addresses.indexOf(address) == -1) {
-    addresses.push(address);
-  }
-
-  // Handling disconnection of a socket.
-  socket.on("disconnect", (socket) => {
-    avatars[avatars.findIndex((a) => a[-1] == socket.id)][-1] = null;
-  });
+// Handling disconnection of a socket.
+io.on("disconnect", (socket) => {
+  console.log("Disconnected !");
+  avatars[avatars.findIndex((a) => a[-1] == socket.id)][-1] = null;
 });
 
 io.engine.on("initial_headers", (headers, req) => {
   // Defining the object to be emitted.
   const object = {
-    x: randomPlace(800),
-    y: randomPlace(600),
+    x: randomPlace(400),
+    y: randomPlace(300),
+    col_x: randomPlace(400),
+    col_y: randomPlace(300),
   };
-  object.col_x = randomPlace(800);
-  object.col_y = randomPlace(400);
-
-  // Set the player's avatar
-  avatars[avatars.length - addresses.length - 1][1] = address;
-  object.avatar = avatars[avatars.length - addresses.length - 1];
 
   // Emition of the "new player" event to all connected sockets.
-  io.emit("new player", object);
+  io.emit("new_player", object);
 });
 
 // Random place defining function.

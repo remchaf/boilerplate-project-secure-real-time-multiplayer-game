@@ -1,16 +1,17 @@
 import Player from "./Player.mjs";
 import Collectible from "./Collectible.mjs";
 // Instanciation of the socket.io class
-const socket = io();
+const socket = io({ forceNewConnection: false });
 
 // Global constants.
 const canvas = document.getElementById("game-window");
 const context = canvas.getContext("2d");
-const GAME_WIDTH = 800;
-const GAME_HEIGHT = 600;
+const GAME_WIDTH = 400;
+const GAME_HEIGHT = 300;
+let lastTime = 0;
 
-let player = null;
-let collectible = null;
+let player;
+let collectible;
 
 // The event listener
 document.addEventListener("keydown", (event) => {
@@ -32,82 +33,66 @@ document.addEventListener("keydown", (event) => {
       alert("DOWN");
       break;
     default:
-      alert("INVALID KEY ! Use 'W' 'A' 'S' 'D' arrow keys.");
+      // alert("INVALID KEY ! Use 'W' 'A' 'S' 'D' arrow keys.");
       break;
   }
 });
 
-socket.on("new player", (data) => {
-  console.log(data);
+// Handling a new connection to the game
+socket.on("new_player", (object) => {
   if (!collectible) {
-    collectible = new Collectible({ x: data.col_x, y: data.col_y });
+    collectible = new Collectible(object.col_x, object.col_y);
+    console.log(collectible);
   }
 
+  // Player
   if (!player) {
-    player = new Player(
-      GAME_WIDTH / 2,
-      GAME_HEIGHT / 2,
-      0,
-      "only_player",
-      15,
-      15,
-      data.avatar
-    );
+    player = new Player(object.x, object.y, 0, "myId", 15, 15, "blue");
+    console.log(player);
+  }
+  return;
+});
+
+socket.on("connect", function () {
+  if (collectible) {
+    gameLoop(0);
   }
 });
 
-socket.on("connect", async function (socket) {
-  console.log(socket);
+// About the game loop
+function gameLoop(timestamp) {
+  const dt = timestamp - lastTime;
+  lastTime = timestamp;
 
-  // About the game loop
-  // let lastTime = 0;
-  // function gameLoop(timestamp) {
-  //   // Clearing the canvas
-  //   context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  // Clearing the canvas
+  context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-  //   const dt = timestamp - lastTime;
-  //   lastTime = timestamp;
+  // Display the game object's elements
+  collectible.display(context);
+  player.display(context);
 
-  //   collectible.display(context);
+  // if (player) {
   //   player.display(context);
+  //   requestAnimationFrame(gameLoop);
   // }
+}
 
-  // requestAnimationFrame(gameLoop);
-
-  // socket.on("disconnecting", (socket) => {
-  //   socket.send("Bye !");
-  //   return;
-  // });
-});
-
+// if (!player) {
+//   console.log("No Player !");
+//   player = new Player(
+//     GAME_WIDTH / 2,
+//     GAME_HEIGHT / 2,
+//     0,
+//     "only_player",
+//     15,
+//     15,
+//     data.avatar
+//   );
+// }
 // function gameLoop(ctx, player) {
-//   ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-//   collectible.display(context, GAME_WIDTH, GAME_HEIGHT);
-//   player.display(context);
-
 //   if (player.collision(collectible)) {
 //     player.score++;
 //     collectible.update(GAME_WIDTH, GAME_HEIGHT);
 //     socket.emit("collision", { player: player.ID });
 //   }
 // }
-
-// function user_input() {
-//   document.onkeydown((event) => {
-//     switch (event.key.toUppercase()) {
-//       case "W":
-//       case "VK_UP":
-//         return "up";
-//       case "A":
-//       case "VK_LEFT":
-//         return "left";
-//       case "S":
-//       case "VK_DOWN":
-//         return "down";
-//       case "D":
-//       case "VK_RIGHT":
-//         return "right";
-//     }
-//   });
-// }
-

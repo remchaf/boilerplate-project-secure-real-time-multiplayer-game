@@ -1,14 +1,15 @@
 class Collectible {
-  constructor(x = 10, y = 10, value = 0, id = 1) {
+  constructor(x = 15, y = 15, value = 0, id = 1) {
     this.x = x;
     this.y = y;
     this.value = value;
     this.id = id;
+    this.avatar = document.getElementById("collectible");
   }
 
   display(ctx) {
-    const collectible_avatar = document.getElementById("collectible");
-    ctx.drawImage(collectible_avatar, this.x, this.y, 10, 10);
+    ctx.drawImage(this.avatar, this.x, this.y, 15, 15);
+    return;
   }
 
   update(param_object) {
