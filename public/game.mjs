@@ -8,29 +8,31 @@ const canvas = document.getElementById("game-window");
 const context = canvas.getContext("2d");
 const GAME_WIDTH = 400;
 const GAME_HEIGHT = 300;
-let lastTime = 0;
 
-let player;
-let collectible;
+let player = new Player(160, 50, 0, "myId", 30, 30, "blue");
+let collectible = new Collectible(140, 30, 0, "dj", 10, 10);
+
+collectible.display(context);
+player.display(context);
 
 // The event listener
 document.addEventListener("keydown", (event) => {
   switch (event.key) {
     case "ArrowLeft":
     case "a":
-      alert("LEFT");
+      player.movePlayer("left", 15);
       break;
     case "ArrowRight":
     case "d":
-      alert("RIGHT");
+      player.movePlayer("right", 15);
       break;
     case "ArrowUp":
     case "w":
-      alert("UP");
+      player.movePlayer("up", 15);
       break;
     case "ArrowDown":
     case "s":
-      alert("DOWN");
+      player.movePlayer("down", 15);
       break;
     default:
       // alert("INVALID KEY ! Use 'W' 'A' 'S' 'D' arrow keys.");
@@ -38,32 +40,24 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-// Handling a new connection to the game
-socket.on("new_player", (object) => {
-  if (!collectible) {
-    collectible = new Collectible(object.col_x, object.col_y);
-    console.log(collectible);
-  }
-
-  // Player
-  if (!player) {
-    player = new Player(object.x, object.y, 0, "myId", 15, 15, "blue");
-    console.log(player);
-  }
-  return;
-});
-
-socket.on("connect", function () {
-  if (collectible) {
-    gameLoop(0);
+document.addEventListener("keyup", (event) => {
+  switch (event.key) {
+    case "ArrowLeft":
+    case "ArrowRight":
+    case "ArrowUp":
+    case "ArrowDown":
+    case "a":
+    case "w":
+    case "s":
+    case "d":
+      canvas.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+      break;
+    case "default":
+      break;
   }
 });
 
-// About the game loop
-function gameLoop(timestamp) {
-  const dt = timestamp - lastTime;
-  lastTime = timestamp;
-
+function gameLoop() {
   // Clearing the canvas
   context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
@@ -71,11 +65,49 @@ function gameLoop(timestamp) {
   collectible.display(context);
   player.display(context);
 
-  // if (player) {
-  //   player.display(context);
-  //   requestAnimationFrame(gameLoop);
-  // }
+  requestAnimationFrame(gameLoop);
 }
+
+gameLoop();
+
+// Handling a new connection to the game
+// socket.on("new_player", (object) => {
+//   if (!collectible) {
+//     collectible = new Collectible(object.col_x, object.col_y);
+//     console.log(collectible);
+//   }
+
+//   // Player
+//   if (!player) {
+//     player = new Player(object.x, object.y, 0, "myId", 15, 15, "blue");
+//     console.log(player);
+//   }
+//   return;
+// });
+
+// socket.on("connect", function () {
+//   if (collectible) {
+//     gameLoop(0);
+//   }
+// });
+
+// About the game loop
+// function gameLoop(timestamp) {
+//   const dt = timestamp - lastTime;
+//   lastTime = timestamp;
+
+//   // Clearing the canvas
+//   context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+//   // Display the game object's elements
+//   collectible.display(context);
+//   player.display(context);
+
+// if (player) {
+//   player.display(context);
+//   requestAnimationFrame(gameLoop);
+// }
+// }
 
 // if (!player) {
 //   console.log("No Player !");
