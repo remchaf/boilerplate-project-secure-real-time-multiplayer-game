@@ -6,17 +6,25 @@ const socket = io({ forceNewConnection: false });
 // Global constants.
 const canvas = document.getElementById("game-window");
 const context = canvas.getContext("2d");
-const GAME_WIDTH = 400;
-const GAME_HEIGHT = 300;
+const GAME = {
+  width: 400,
+  height: 400,
+};
 
-let player = new Player(160, 50, 0, "myId", 30, 30, "blue");
-let collectible = new Collectible(140, 30, 0, "dj", 10, 10);
+let game_object = [];
+
+let player = new Player(160, 50, "myId", 30, 30, img("blue"));
+let collectible = new Collectible(140, 30, 1, "dj", 10, 10);
 
 collectible.display(context);
 player.display(context);
 
+game_object.push(player);
+game_object.push(collectible);
+
 // The event listener
 document.addEventListener("keydown", (event) => {
+  context.clearRect(0, 0, GAME.width, GAME.height);
   switch (event.key) {
     case "ArrowLeft":
     case "a":
@@ -32,12 +40,13 @@ document.addEventListener("keydown", (event) => {
       break;
     case "ArrowDown":
     case "s":
-      player.movePlayer("down", 15);
-      break;
+      player.movePlayer("down", 15); //
+      break; //
     default:
       // alert("INVALID KEY ! Use 'W' 'A' 'S' 'D' arrow keys.");
       break;
   }
+  return;
 });
 
 document.addEventListener("keyup", (event) => {
@@ -50,20 +59,33 @@ document.addEventListener("keyup", (event) => {
     case "w":
     case "s":
     case "d":
-      canvas.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+      context.clearRect(0, 0, GAME.width, GAME.height);
       break;
     case "default":
       break;
   }
 });
 
+// Displayement of the player's id on the nav-bar
+document.getElementById("_id").innerText = player.id
+
 function gameLoop() {
+  // Collision case handling
+  if (player.collision(collectible)) {
+    collectible.update(GAME);
+    player.score += collectible.value;
+  }
+
   // Clearing the canvas
-  context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  context.clearRect(0, 0, GAME.width, GAME.height);
+
+  // Displaying the different info in the nav-bar
+  document.getElementById("score").innerText = player.score([player])
 
   // Display the game object's elements
-  collectible.display(context);
-  player.display(context);
+  for (const i of game_object) {
+    i.display(context);
+  }
 
   requestAnimationFrame(gameLoop);
 }
@@ -97,7 +119,7 @@ gameLoop();
 //   lastTime = timestamp;
 
 //   // Clearing the canvas
-//   context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+//   context.clearRect(0, 0, GAME.width, GAME.height);
 
 //   // Display the game object's elements
 //   collectible.display(context);
@@ -112,8 +134,8 @@ gameLoop();
 // if (!player) {
 //   console.log("No Player !");
 //   player = new Player(
-//     GAME_WIDTH / 2,
-//     GAME_HEIGHT / 2,
+//     GAME.width / 2,
+//     GAME.height / 2,
 //     0,
 //     "only_player",
 //     15,
@@ -124,7 +146,14 @@ gameLoop();
 // function gameLoop(ctx, player) {
 //   if (player.collision(collectible)) {
 //     player.score++;
-//     collectible.update(GAME_WIDTH, GAME_HEIGHT);
+//     collectible.update(GAME.width, GAME.height);
 //     socket.emit("collision", { player: player.ID });
 //   }
 // }
+
+function img(url) {
+  let image = new Image();
+  image.src = "../assets/images/gost-" + url + ".png";
+  image.alt = "player_id_avatar";
+  return image;
+}

@@ -5,16 +5,18 @@ class Collectible {
     this.value = value;
     this.id = id;
     this.avatar = document.getElementById("collectible");
+    this.height = 15;
+    this.width = 15;
   }
 
   display(ctx) {
-    ctx.drawImage(this.avatar, this.x, this.y, 15, 15);
+    ctx.drawImage(this.avatar, this.x, this.y, this.width, this.height);
     return;
   }
 
-  update(param_object) {
-    this.x = param_object.x;
-    this.y = param_object.y;
+  update(g) {
+    this.x = Math.round(Math.random() * (g.width - 10) + 5);
+    this.y = Math.round(Math.random() * (g.height - 10) + 5);
   }
 }
 

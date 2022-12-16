@@ -1,12 +1,12 @@
 class Player {
-  constructor(x, y, score, id, width, height, avatar) {
+  constructor(x, y, id, width, height, avatar) {
     this.x = x;
     this.y = y;
-    this.score = score;
+    this.score = 0;
     this.id = id;
     this.width = width;
     this.height = height;
-    this.avatar = document.getElementById(avatar);
+    this.avatar = avatar;
   }
 
   movePlayer(dir, speed) {
@@ -31,13 +31,14 @@ class Player {
 
   collision(item) {
     if (
-      item.x + item.width >= this.x &&
-      item.x <= this.x + this.width &&
-      item.y + item.height >= this.y &&
-      item.y <= this.y + this.height
+      item.x + item.width / 2 - 5 >= this.x - this.width / 2 &&
+      item.x - item.width / 2 + 5 <= this.x + this.width / 2 &&
+      item.y + item.height / 2 - 5 >= this.y - this.height &&
+      item.y - item.height / 2 + 5 <= this.y + this.height / 2
     ) {
       return true;
     } else {
+      // console.log(false);
       return false;
     }
   }
@@ -50,7 +51,7 @@ class Player {
 
   display(ctx) {
     ctx.drawImage(this.avatar, this.x, this.y, 15, 15);
-    return 
+    return;
   }
 }
 

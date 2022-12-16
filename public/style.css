@@ -9,7 +9,7 @@ code {
 canvas {
   margin: auto;
   width: 400px;
-  height: 300px;
+  height: 400px;
   background-color: whitesmoke;
 }
 
@@ -37,4 +37,36 @@ canvas {
   display: none;
   width: 35px;
   height: 35px;
+}
+
+#nav-bar {
+  width: 400px;
+  height: 35px;
+  background-color: rgb(117, 110, 13);
+  margin-left: 77px;
+  display: flex;
+  flex-direction: center;
+}
+
+#instuctions {
+  background-color: chartreuse;
+  width: 200px;
+  height: 76px;
+  border: solid 1px;
+}
+
+#cont {
+  width: 200px;
+  border: white solid 1px;
+}
+
+#_id {
+  background-color: blue;
+  border: black solid 1px;
+}
+
+#score {
+  background-color: red;
+  width: 50px;
+  border: yellow solid 1px
 }
