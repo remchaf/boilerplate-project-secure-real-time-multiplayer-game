@@ -7,8 +7,8 @@ const socket = io({ forceNewConnection: false });
 const canvas = document.getElementById("game-window");
 const context = canvas.getContext("2d");
 const GAME = {
-  width: 400,
-  height: 400,
+  width: 640,
+  height: 480,
 };
 
 let game_object = [];
@@ -67,7 +67,7 @@ document.addEventListener("keyup", (event) => {
 });
 
 // Displayement of the player's id on the nav-bar
-document.getElementById("_id").innerText = player.id
+document.getElementById("player_id").innerText = player.id;
 
 function gameLoop() {
   // Collision case handling
@@ -79,8 +79,10 @@ function gameLoop() {
   // Clearing the canvas
   context.clearRect(0, 0, GAME.width, GAME.height);
 
-  // Displaying the different info in the nav-bar
-  document.getElementById("score").innerText = player.score([player])
+  // Displaying the actual player rank in the nav-bar
+  document.getElementById("rank").innerText = player.calculateRank([player]);
+  document.getElementById("Instructions").innerText = player.score;
+  document.getElementById("player_id").innerText = player.x + " - " + player.y;
 
   // Display the game object's elements
   for (const i of game_object) {
@@ -113,22 +115,7 @@ gameLoop();
 //   }
 // });
 
-// About the game loop
-// function gameLoop(timestamp) {
-//   const dt = timestamp - lastTime;
-//   lastTime = timestamp;
 
-//   // Clearing the canvas
-//   context.clearRect(0, 0, GAME.width, GAME.height);
-
-//   // Display the game object's elements
-//   collectible.display(context);
-//   player.display(context);
-
-// if (player) {
-//   player.display(context);
-//   requestAnimationFrame(gameLoop);
-// }
 // }
 
 // if (!player) {

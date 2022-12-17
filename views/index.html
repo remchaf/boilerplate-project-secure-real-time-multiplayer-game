@@ -18,19 +18,24 @@
     <script>
       var socket = io();
     </script>
-    <!-- <script src="../node_modules/socket.io/lib/client.js"></script> -->
   </head>
   <body>
     <header>
       <h1>Secure Real Time Multiplayer Game</h1>
     </header>
     <hr style="margin: 25px" />
-    <div id="nav-bar">
-      <div id="instructions">Instructions</div>
-      <div id="_id">fdfuh</div>
-      <div id="score">gfdhfj</div>
-    </div>
     <div class="container">
+      <div id="nav-bar">
+        <div id="instructions">
+          <span class="sp" id="Instructions"></span>
+        </div>
+        <div id="_id">
+          <span class="sp" id="player_id"></span>
+        </div>
+        <div id="score">
+          <span class="sp">Rank: </span><span class="sp" id="rank">1 / 1</span>
+        </div>
+      </div>
       <canvas ref="game" id="game-window" width="640" height="480"> </canvas>
     </div>
     <div>
