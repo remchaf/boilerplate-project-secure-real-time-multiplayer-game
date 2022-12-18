@@ -43,27 +43,9 @@ document.addEventListener("keydown", (event) => {
       player.movePlayer("down", 15); //
       break; //
     default:
-      // alert("INVALID KEY ! Use 'W' 'A' 'S' 'D' arrow keys.");
       break;
   }
   return;
-});
-
-document.addEventListener("keyup", (event) => {
-  switch (event.key) {
-    case "ArrowLeft":
-    case "ArrowRight":
-    case "ArrowUp":
-    case "ArrowDown":
-    case "a":
-    case "w":
-    case "s":
-    case "d":
-      context.clearRect(0, 0, GAME.width, GAME.height);
-      break;
-    case "default":
-      break;
-  }
 });
 
 // Displayement of the player's id on the nav-bar
@@ -82,7 +64,6 @@ function gameLoop() {
   // Displaying the actual player rank in the nav-bar
   document.getElementById("rank").innerText = player.calculateRank([player]);
   document.getElementById("Instructions").innerText = player.score;
-  document.getElementById("player_id").innerText = player.x + " - " + player.y;
 
   // Display the game object's elements
   for (const i of game_object) {
@@ -91,7 +72,7 @@ function gameLoop() {
 
   requestAnimationFrame(gameLoop);
 }
-
+// 778552291 mamadou
 gameLoop();
 
 // Handling a new connection to the game
@@ -114,7 +95,6 @@ gameLoop();
 //     gameLoop(0);
 //   }
 // });
-
 
 // }
 

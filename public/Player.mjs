@@ -23,7 +23,6 @@ class Player {
       case "right":
         this.x + this.width / 2 < 625 ? (this.x += speed) : (this.x = 625);
         break;
-
       default:
         break;
     }
