@@ -1,5 +1,5 @@
 class Collectible {
-  constructor(x = 15, y = 15, value = 0, id = 1) {
+  constructor(game_width, game_height, x, y, value = 1, id = "game colletible") {
     this.x = x;
     this.y = y;
     this.value = value;
@@ -15,8 +15,8 @@ class Collectible {
   }
 
   update(g) {
-    this.x = Math.round(Math.random() * (g.width - 10) + 5);
-    this.y = Math.round(Math.random() * (g.height - 10) + 5);
+    this.x = random_position(g.width);
+    this.y = random_position(g.height);
   }
 }
 
@@ -29,3 +29,5 @@ try {
 } catch (e) {}
 
 export default Collectible;
+
+const random_position = (param) => Math.round(Math.random() * (param - 10) + 5)

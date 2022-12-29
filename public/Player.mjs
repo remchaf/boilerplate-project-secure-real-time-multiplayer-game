@@ -58,6 +58,10 @@ class Player {
     ctx.drawImage(this.avatar, this.x, this.y, 15, 15);
     return;
   }
+
+  hover() {
+    
+  }
 }
 
 export default Player;

@@ -84,10 +84,18 @@ io.engine.on("initial_headers", (headers, req) => {
     y: randomPlace(300),
     col_x: randomPlace(400),
     col_y: randomPlace(300),
+    id: "blue"
   };
 
   // Emition of the "new player" event to all connected sockets.
-  io.emit("new_player", object);
+  setTimeout(() => {
+    io.emit("new_player", object);
+  }, 1000);
+});
+
+// Collision events handling
+io.on("collision", (object) => {
+  console.log(object.id);
 });
 
 // Random place defining function.

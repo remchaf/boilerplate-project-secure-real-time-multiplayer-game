@@ -22,11 +22,6 @@ canvas {
   .container {
     flex-direction: row;
   }
-
-  #nav-bar {
-    position: absolute;
-    left: 200px;
-  }
 }
 
 #collectible {
@@ -58,6 +53,7 @@ canvas {
 #instructions {
   width: 200px;
   text-align: center;
+  color: whitesmoke;
 }
 
 #_id {
@@ -74,5 +70,5 @@ canvas {
   position: relative;
   top: 7px;
   color: rgb(226, 226, 226);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
