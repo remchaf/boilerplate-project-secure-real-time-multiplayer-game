@@ -3,6 +3,10 @@ import Collectible from "./Collectible.mjs";
 // Instanciation of the socket.io class
 const socket = io({ forceNewConnection: false });
 
+socket.on("my-event", () => {
+  console.log("my-event");
+});
+
 // Global constants.
 const canvas = document.getElementById("game-window");
 const context = canvas.getContext("2d");
@@ -13,110 +17,112 @@ const GAME = {
 
 let game_object = [];
 
-let player = new Player(160, 50, "myId", 30, 30, img("blue"));
-let collectible = new Collectible(140, 30, 1, "dj", 10, 10);
+let mainplayer;
+let collectible;
 
-collectible.display(context);
-player.display(context);
+// collectible.display(context);
+// player.display(context);
 
-game_object.push(player);
-game_object.push(collectible);
+// game_object.push(player);
+// game_object.push(collectible);
 
 // The event listener
 document.addEventListener("keydown", (event) => {
-  context.clearRect(0, 0, GAME.width, GAME.height);
-  switch (event.key) {
-    case "ArrowLeft":
-    case "a":
-      player.movePlayer("left", 15);
-      break;
-    case "ArrowRight":
-    case "d":
-      player.movePlayer("right", 15);
-      break;
-    case "ArrowUp":
-    case "w":
-      player.movePlayer("up", 15);
-      break;
-    case "ArrowDown":
-    case "s":
-      player.movePlayer("down", 15); //
-      break; //
-    default:
-      break;
-  }
+  move_player(mainplayer, event);
   return;
 });
 
-// Displayement of the player's id on the nav-bar
-document.getElementById("player_id").innerText = player.id;
+let Width = document.getElementsByClassName("container")[0].clientWidth;
 
+// The game loop function
 function gameLoop() {
-  // Collision case handling
-  if (player.collision(collectible)) {
-    collectible.update(GAME);
-    player.score += collectible.value;
-  }
+  if (collectible && mainplayer) {
+    // Collision case handling
+    if (mainplayer.collision(collectible)) {
+      mainplayer.score += collectible.value;
+      console.log("Collision");
+      // collectible.update(GAME);
+      // collectible.distroy();
 
-  // Clearing the canvas
-  context.clearRect(0, 0, GAME.width, GAME.height);
+      socket.emit("collision", { id: mainplayer.id });
+    }
 
-  // Displaying the actual player rank in the nav-bar
-  document.getElementById("rank").innerText = player.calculateRank([player]);
-  document.getElementById("Instructions").innerText = player.score;
+    // window min-width media
+    if (window.innerWidth >= 800) {
+      document.getElementById("nav-bar").style =
+        "position: absolute; left: " +
+        (Width - 400) / 2 +
+        "px; background-color: orange; top: 510px";
+    }
 
-  // Display the game object's elements
-  for (const i of game_object) {
-    i.display(context);
+    // Clearing the canvas
+    context.clearRect(0, 0, GAME.width, GAME.height);
+
+    // Displaying the actual player rank in the nav-bar
+    document.getElementById("rank").innerText = mainplayer.calculateRank([
+      mainplayer,
+    ]);
+
+    // Display the game object's elements
+    for (const i of game_object) {
+      i.display(context);
+    }
   }
 
   requestAnimationFrame(gameLoop);
 }
-// 778552291 mamadou
+
 gameLoop();
 
-// Handling a new connection to the game
-// socket.on("new_player", (object) => {
-//   if (!collectible) {
-//     collectible = new Collectible(object.col_x, object.col_y);
-//     console.log(collectible);
-//   }
+// Collision from other players handling
+socket.on("collision", (data) => {
+  collectible.update(data);
+  console.log(data);
+});
 
-//   // Player
-//   if (!player) {
-//     player = new Player(object.x, object.y, 0, "myId", 15, 15, "blue");
-//     console.log(player);
-//   }
-//   return;
-// });
+// New Player connection
+socket.on("new_player", (data) => {
+  socket.emit("collision", { i: "esfigjhbaojbfg" });
+  if (collectible) {
+    // console.log("yet had a collectible");
+    return;
+  }
 
-// socket.on("connect", function () {
-//   if (collectible) {
-//     gameLoop(0);
-//   }
-// });
+  if (mainplayer) {
+    game_object.push(
+      new Player(data.x, data.y, data.id + "_player", 20, 20, img(data.id))
+    );
+    return;
+  }
 
-// }
+  // Constructing the collectible with the gotten coordinates
+  collectible = new Collectible(
+    GAME.width,
+    GAME.height,
+    data.col_x,
+    data.col_y,
+    1,
+    "coll_object"
+  );
+  game_object.push(collectible);
+  collectible.display(context);
 
-// if (!player) {
-//   console.log("No Player !");
-//   player = new Player(
-//     GAME.width / 2,
-//     GAME.height / 2,
-//     0,
-//     "only_player",
-//     15,
-//     15,
-//     data.avatar
-//   );
-// }
-// function gameLoop(ctx, player) {
-//   if (player.collision(collectible)) {
-//     player.score++;
-//     collectible.update(GAME.width, GAME.height);
-//     socket.emit("collision", { player: player.ID });
-//   }
-// }
+  // Construction of the main player
+  mainplayer = new Player(
+    data.x,
+    data.y,
+    data.id + "_player",
+    15,
+    15,
+    img(data.id)
+  );
+  // console.log(mainplayer);
+  game_object.push(mainplayer);
+  mainplayer.display(context);
+
+  // Displaying the player's id on the nav-bar
+  document.getElementById("player_id").innerText = mainplayer.id;
+});
 
 function img(url) {
   let image = new Image();
@@ -124,3 +130,34 @@ function img(url) {
   image.alt = "player_id_avatar";
   return image;
 }
+
+const move_player = (playing, e) => {
+  switch (e.key) {
+    case "ArrowLeft":
+    case "a":
+      playing.movePlayer("left", 15);
+      break;
+    case "ArrowRight":
+    case "d":
+      playing.movePlayer("right", 15);
+      break;
+    case "ArrowUp":
+    case "w":
+      playing.movePlayer("up", 15);
+      break;
+    case "ArrowDown":
+    case "s":
+      playing.movePlayer("down", 15);
+      break;
+    default:
+      break;
+  }
+  return;
+};
+
+socket.on("disconnect", (reason) => {
+  if (reason === "io server disconnect") {
+    // the disconnection was initiated by the server, you need to reconnect manually
+    socket.disconnect();
+  }
+});

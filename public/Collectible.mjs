@@ -1,5 +1,12 @@
 class Collectible {
-  constructor(game_width, game_height, x, y, value = 1, id = "game colletible") {
+  constructor(
+    game_width,
+    game_height,
+    x,
+    y,
+    value = 1,
+    id = "game colletible"
+  ) {
     this.x = x;
     this.y = y;
     this.value = value;
@@ -15,9 +22,13 @@ class Collectible {
   }
 
   update(g) {
-    this.x = random_position(g.width);
-    this.y = random_position(g.height);
+    this.x = g.col_x;
+    this.y = g.col_y;
   }
+
+  // distroy() {
+  //   document.getElementById("coll_object").remove();
+  // }
 }
 
 /*
@@ -30,4 +41,4 @@ try {
 
 export default Collectible;
 
-const random_position = (param) => Math.round(Math.random() * (param - 10) + 5)
+// const random_position = (param) => Math.round(Math.random() * (param - 10) + 5)

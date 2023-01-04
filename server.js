@@ -5,8 +5,12 @@ const bodyParser = require("body-parser");
 // const socket = require("socket.io");
 const cors = require("cors");
 const helmet = require("helmet");
-// const game = require("./public/game_const.mjs");
 
+// Game constants
+const GAME = {
+  width: 640,
+  height: 480,
+};
 const fccTestingRoutes = require("./routes/fcctesting.js");
 const runner = require("./test-runner.js");
 
@@ -59,7 +63,6 @@ const io = Server(httpServer, {
 
 // Addresses
 var addresses = [];
-
 const avatars = [
   ["blue", null],
   ["green", null],
@@ -71,10 +74,16 @@ io.once("connection", async (socket) => {
   console.log(socket.id);
 });
 
+io.on("connection", (socket) => {
+  socket.on("my-event", () => {
+    console.log("my event");
+  });
+});
+
 // Handling disconnection of a socket.
-io.on("disconnect", (socket) => {
+io.on("connection error", (socket) => {
   console.log("Disconnected !");
-  avatars[avatars.findIndex((a) => a[-1] == socket.id)][-1] = null;
+  socket.disconnect();
 });
 
 io.engine.on("initial_headers", (headers, req) => {
@@ -84,7 +93,7 @@ io.engine.on("initial_headers", (headers, req) => {
     y: randomPlace(300),
     col_x: randomPlace(400),
     col_y: randomPlace(300),
-    id: "blue"
+    id: "blue",
   };
 
   // Emition of the "new player" event to all connected sockets.
@@ -95,7 +104,12 @@ io.engine.on("initial_headers", (headers, req) => {
 
 // Collision events handling
 io.on("collision", (object) => {
-  console.log(object.id);
+  console.log("Collision");
+  io.emit("collision", {
+    id: object.id,
+    col_x: randomPlace(GAME.width),
+    col_y: randomPlace(GAME.height),
+  });
 });
 
 // Random place defining function.
@@ -119,3 +133,6 @@ httpServer.listen(portNum, () => {
 });
 
 module.exports = app; // For testing
+
+// Random position function
+const random_position = (param) => Math.round(Math.random() * (param - 10) + 5);
